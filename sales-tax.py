@@ -1,11 +1,43 @@
-"""
-curl 'https://connect.squareup.com/v1/me/payments?begin_time=2014-04-01T00:00:00Z&end_time=2014-04-03T00:00:00Z&limit=1' \
--H 'Authorization: Bearer YA38Wo6Z5VS9CH6bF-H6IQ'
-"""
-
 import requests
 import re
 import time
+import logging.config
+import yaml
+import os, sys
+
+def setup_logging(
+    default_path='logging.yml', 
+    default_level=logging.INFO
+):
+    """Setup logging configuration
+
+    """
+    path = default_path
+    if os.path.exists(path):
+        with open(path, 'rt') as f:
+            config = yaml.load(f.read())
+        logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=default_level)
+
+def setup_config(
+	default_path='config.yml'
+):
+	# Load config files
+	try:
+		if len(sys.argv) > 1:
+			filename = sys.argv[1]
+		else:
+			filename = default_path
+		f = open(filename)
+		config = yaml.safe_load(f)
+		f.close()
+
+		return config
+
+	except Exception, err:
+		logging.exception(err)
+		sys.exit(1)
 
 def CheckHeaders(headers):
 	if 'link' in headers:
@@ -49,13 +81,14 @@ def CheckToGo(JSONdata):
 					print item['name'] + " : $" + str(item['total_money']['amount']/100) + " : " + transaction['receipt_url']
 
 if __name__ == "__main__":
-	begin_time 	= '2015-01-01T00:00:00Z'
-	end_time 	= '2015-04-01T00:00:00Z'
-	url 		= 'https://connect.squareup.com/v1/me/payments'
-	params 		= { 'begin_time' : begin_time, 'end_time' : end_time }
-	headers 	= { 'Authorization' : 'Bearer YA38Wo6Z5VS9CH6bF-H6IQ' }
+	setup_logging()
+	config = setup_config()
 
-	
+	begin_time 	= config['begin_time']
+	end_time 	= config['end_time']
+	url 		= config['url']
+	params 		= { 'begin_time' : begin_time, 'end_time' : end_time }
+	headers 	= { 'Authorization' : config['auth_token'] }
 
 	r = requests.get(url, headers=headers, params=params)
 
