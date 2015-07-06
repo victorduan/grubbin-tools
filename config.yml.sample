@@ -1,0 +1,11 @@
+### Square ###
+begin_time: 2015-07-02T00:00:00Z
+end_time: 2015-07-06T00:00:00Z
+auth_token: Bearer token_from_square
+url: https://connect.squareup.com/v1/me/payments
+
+### MySQL ###
+host: 10.10.10.10
+user: root
+pass: root_password
+db: warehouse
