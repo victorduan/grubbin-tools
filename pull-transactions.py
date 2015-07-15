@@ -5,6 +5,23 @@ import requests
 import re
 import os, sys
 import time
+from datetime import datetime
+
+def usage(message = '', exit = True):
+	"""
+	Display usage information, with an error message if provided.
+	"""
+	if len(message) > 0:
+		sys.stderr.write('\n%s\n' % message)
+		sys.stderr.write('\n');
+		sys.stderr.write('Usage: python pull-transactions.py start_date end_date\n')
+		sys.stderr.write('\n')
+		sys.stderr.write('Example\n')
+		sys.stderr.write('       python pull-transactions.py 2015-07-14 2015-07-15\n')
+		sys.stderr.write('\n')
+		sys.stderr.write('\n')
+	if exit:
+		sys.exit(1)
 
 def setup_logging(
     default_path='logging.yml', 
@@ -26,10 +43,7 @@ def setup_config(
 ):
 	# Load config files
 	try:
-		if len(sys.argv) > 1:
-			filename = sys.argv[1]
-		else:
-			filename = default_path
+		filename = default_path
 		f = open(filename)
 		config = yaml.safe_load(f)
 		f.close()
@@ -158,13 +172,25 @@ def CheckHeaders(headers):
 	return next_url
 
 if __name__ == "__main__":
+	if len(sys.argv) < 3:
+		sys.stderr.write('Please specify the correct number of command line arguments!\n')
+		usage()
 
 	setup_logging()
 
 	config = setup_config()
 
-	begin_time 	= config['begin_time']
-	end_time 	= config['end_time']
+	# Define date to run
+	try:
+		begin_time = 	str(datetime.strptime(sys.argv[1], '%Y-%m-%d').date()) + 'T00:00:00Z'
+		end_time = 		str(datetime.strptime(sys.argv[2], '%Y-%m-%d').date()) + 'T00:00:00Z'
+		print begin_time
+		print end_time
+	except ValueError, err:
+		sys.stderr.write('Problem converting one or both dates.\n')
+		usage()
+		sys.exit(1)
+
 	url 		= config['url']
 	params 		= { 'begin_time' : begin_time, 'end_time' : end_time }
 	headers 	= { 'Authorization' : config['auth_token'] }
