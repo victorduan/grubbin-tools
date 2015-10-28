@@ -72,6 +72,8 @@ def CheckToGo(JSONdata):
 		for item in transaction['itemizations']:
 			if item['name'] == "To-Go":
 				togo = True
+			elif item['name'] == "Phone Order":
+				togo = True
 
 		if togo == True:
 			# Loop through the transaction again and look for specific items
@@ -81,7 +83,7 @@ def CheckToGo(JSONdata):
 					print item['name'] + " : $" + str(item['total_money']['amount']/100) + " : " + transaction['receipt_url']
 
 if __name__ == "__main__":
-	setup_logging()
+	#setup_logging()
 	config = setup_config()
 
 	begin_time 	= config['begin_time']
