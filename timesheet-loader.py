@@ -42,7 +42,7 @@ def setup_config(
 
 def insert_timesheet(data):
 	query = """
-		INSERT IGNORE INTO `warehouse`.`timesheets`
+		INSERT INTO `warehouse`.`timesheets`
 		(
 		`emp_id`,
 		`date`,
@@ -55,7 +55,11 @@ def insert_timesheet(data):
 		%(date)s,
 		%(clock_in)s,
 		%(clock_out)s
-		);
+		)
+		ON DUPLICATE KEY UPDATE
+		`clock_in` = %(clock_in)s,
+		`clock_out` = %(clock_out)s
+		;
 	"""
 	for batch in data_batcher(data):
 		bulk_insert(batch, query)
